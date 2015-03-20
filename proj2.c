@@ -69,7 +69,7 @@ void traverse2(unsigned int fileInfoDec[], char fileInfo[])
         if (attributeNum > 3 && attributeNum < 8 || attributeNum > 11) //if second-highest bit is set
             attributes[4] = 'S'; //system file
     }
-    printf("   %s  ", attributes); //display file attributes
+    printf("   \t%s  ", attributes); //display file attributes
     
     //Next the date is calculated
     //	printf("Created: ");
