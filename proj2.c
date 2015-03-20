@@ -182,6 +182,18 @@ void traverse(short flag)
     short a,y,z; //variables used for loop counters
     unsigned char fileInfo[32] = {'\0'}; //char array to store a root entry at a time
     unsigned int fileInfoDec[32] = {'\0'}; //int array will store decimal equivalents of fileInfo characters
+    
+        if (flag == 1) {
+        printf("\t*****************************\n");
+        printf("\t** FILE ATTRIBUTE NOTATION **\n");
+        printf("\t**                         **\n");
+        printf("\t** R ------ READ ONLY FILE **\n");
+        printf("\t** S ------ SYSTEM FILE    **\n");
+        printf("\t** H ------ HIDDEN FILE    **\n");
+        printf("\t** A ------ ARCHIVE FILE   **\n");
+        printf("\t*****************************\n");
+    }
+    
     for (a = 19; a < 33; ++a) //reads through sectors 19-32 (root sectors)
     {
         lseek(3, 512*a, SEEK_SET); //changes start position to beginning of sector 'a'
