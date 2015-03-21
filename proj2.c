@@ -1,8 +1,9 @@
-//Project 2
-//CIS 340
-//Provides a shell to look at the FAT tables and memory structure of a floppy disk
+//CIS 340 - Project #2
+//Authors - Samuel Turnage(ID:2579621)
+//
+//Decription - Provides a shell to look at the FAT tables and memory structure of a floppy disk
 
-//include filed
+//include files
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
