@@ -457,7 +457,6 @@ int main()
 			printf("TRAVERSE [-l] -- Display the root directory contents \n ");
 			printf("SHOWFAT -- Display content of the FAT tables \n ");
 			printf("SHOWSECTOR [SectorNumber] -- Show content of specified sector \n ");
-			printf("SHOWFILE [Filename] -- Show content of target file \n ");
 			printf("QUIT -- Quit the floppy shell \n");
 		}
 		else if (strcmp(command,"fmount") == 0)
@@ -491,8 +490,6 @@ int main()
 			showfat(arg1);
 		else if (strcmp(command,"showsector") == 0)
 			showsector(arg1);
-		else if ((strcmp(command,"showfile") == 0) && go == 1)
-			showfile(arg1);
 		else
 			printf("\nInvalid command '%s' entered.  Type 'help' for a list of commands.", command);
 			
