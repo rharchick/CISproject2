@@ -309,66 +309,118 @@ void showsector(char arg[])
         printf("\nInvalid sector number.  Must be a positive integer between 0 and 2879\n");
     printf("\n");
 }
-/*
-void parseCommand()
-{
- 
- 
-}
+
+
 void main()
 {
     bool isRunning = true;
-    
-    while(isRunning)
-    {
-     
-     
-     
-     
-     
-    }
- 
-}
-*/
-int main()
-{
+    bool mounted = false;
     const char prompt[] = {"\nflop: "};
-    short i, j, quit = 0; //loop and sentinel variables
-    FILE *fp; //used for output redirection
-    short fd; //will hold file descriptor value
-    int stdout_copy; //used to hold copy of stdout for output redirection
-    short mounted = 0; //indicates if a floppy has been mounted
-    char *flopname[50];
     
-    //While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
-    while (quit == 0)
+    int bufsize = 100;
+    char *floppyName[bufsize];
+    
+    //output redirection
+    FILE *filePointer;
+    short fileDesc;
+    int stdout_copy;
+
+    
+    while (isRunning)
     {
         //Variables are re-declared for every loop iteration as a means to 'clear' previous values
-        
-        //Words: This is going to be a multidemensional array to help split up to 10 inputs, including the extra flags!
-        //words[0] = input
-        //words[1] =
-        char words[10][20];
-        char input[50] = {'\0'}; //used for storing user input commands
-        char *arg1 = malloc(30); //used for storing arguments that users pass to commands
-        char command[30] = {'\0'};
-        char filename[30] = {'\0'};
+        char commands[5][bufsize];
+        char input[bufsize] = {'\0'}; //used for storing user input commands
+        int inputsize;
+        char *arg1 = malloc(bufsize); //used for storing arguments that users pass to commands
+        char command[bufsize] = {'\0'};
+        char filename[bufsize] = {'\0'};
         short go, redirect, flagValue = 0;
-        char flagcommand[30] = {'\0'};
+        char flagcommand[bufsize] = {'\0'};
         
-        i = 0;
+        
         printf(prompt);
-        fgets(input, 50, stdin);
-        for(j = 0; input[j] != '\0' && j<50; j++)//Cast input to lowercase. Avoids complication with lower-case and upper-case arguments
-            input[j] = tolower(input[j]);
+
         
+        inputsize = read(0, input, sizeof(input) - 1);
+        input[bufsize] = '\0';
+        
+        int curcommand = 0;
+        int curplace = 0;
+        for(int a = 0;a<bufsize;a++)
+        {
+            input[a] = tolower(input[a]);
+            if(input[a] == "" && curcommand < 5)
+            {
+                memcpy( command[curcom], &input[curplace], a-curplace );
+                command[curcom][a-curplace] = '/0';
+                curplace = a;
+                ++curcommand;
+            }
+        }
+        for(int z = 0;z<10;z++)
+        {
+            printf(command[z]);
+        }
+    }
+}
+/*
+int main()
+{
+    
+    bool isRunning = true;
+    bool mounted = false;
+    const char prompt[] = {"\nflop: "};
+    
+    int bufsize = 100;
+    char *floppyName[bufsize];
+    
+    //output redirection
+    FILE *filePointer;
+    short fileDesc;
+    int stdout_copy;
+
+    
+    while (isRunning)
+    {
+        //Variables are re-declared for every loop iteration as a means to 'clear' previous values
+        char commands[5][bufsize];
+        char input[bufsize] = {'\0'}; //used for storing user input commands
+        int inputsize;
+        char *arg1 = malloc(bufsize); //used for storing arguments that users pass to commands
+        char command[bufsize] = {'\0'};
+        char filename[bufsize] = {'\0'};
+        short go, redirect, flagValue = 0;
+        char flagcommand[bufsize] = {'\0'};
+        
+        
+        printf(prompt);
+
+        
+        inputsize = read(0, input, sizeof(input) - 1);
+        input[bufsize] = '\0';
+        
+        int curcommand = 0;
+        int curplace = 0;
+        for(int a = 0;a<bufsize;a++)
+        {
+            input[a] = tolower(input[a]);
+            if(input[a] == "" && curcommand < 5)
+            {
+                memcpy( command[curcom], &input[curplace], a-curplace );
+                command[curcom][a-curplace] = '/0';
+                curplace = a;
+                ++curcommand;
+            }
+        }
+
         char* token;
         const char s[2] = " \n";
         
-        /* get the first token */
+        // get the first token
         token = strtok(input, s);
         strcpy(words[i],token);
-        /* walk through other tokens */
+        // walk through other tokens
         while( token != NULL )
         {
             i++;
@@ -466,3 +518,4 @@ int main()
     }
     return 0;
 }
+*/
