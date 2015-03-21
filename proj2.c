@@ -149,7 +149,7 @@ void fmount(char arg[],char *floppyName[])
 {
     if(open(arg, O_RDONLY) != -1)//file opened
     {
-        strcpy(*flops,arg);//stores file name in flops to allow for easy unmounting
+        strcpy(*floppyName,arg);//stores file name in flops to allow for easy unmounting
         printf("\n%s was mounted\n",*floppyName);
     }
     else//error, file not opened
@@ -313,11 +313,11 @@ void showsector(char arg[])
 
 void main()
 {
-    bool isRunning = true;
-    bool mounted = false;
+    short isRunning = 1;
+    short mounted = 0;
     const char prompt[] = {"\nflop: "};
     
-    int bufsize = 100;
+    const int bufsize = 100;
     char *floppyName[bufsize];
     
     //output redirection
@@ -347,21 +347,25 @@ void main()
         
         int curcommand = 0;
         int curplace = 0;
-        for(int a = 0;a<bufsize;a++)
+        int a = 0;
+        for(a; a<bufsize; a++)
         {
             input[a] = tolower(input[a]);
-            if(input[a] == "" && curcommand < 5)
+            if(input[a] == ' ' && curcommand < 5)
             {
-                memcpy( command[curcom], &input[curplace], a-curplace );
-                command[curcom][a-curplace] = '/0';
+                memcpy( command[curcommand], &input[curplace], a-curplace );
+                command[curcommand][a-curplace] = '/0';
                 curplace = a;
                 ++curcommand;
             }
         }
-        for(int z = 0;z<10;z++)
+        int z = 0;
+        for(z;z<10;z++)
         {
-            printf(command[z]);
+            printf("/n %s",command[z]);
+            
         }
+        if(curcommand > 0)isRunning = 0;
     }
 }
 /*
