@@ -165,7 +165,7 @@ Unmounts the floppy
 void fumount(char * floppyName[])
 {
     close(*floppyName);
-    printf("\n%s was unmounted\n",*flops);
+    printf("\n%s was unmounted\n",*floppyName);
 }
 
 void structure(char* flag)
