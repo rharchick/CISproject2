@@ -1,13 +1,17 @@
+//Project 2
+//CIS 340
+//Provides a shell to look at the FAT tables and memory structure of a floppy disk
+
+//include filed
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-/*CIS 340 - PROJECT 2
- 
- */
 
-//This function converts a specified number of bytes (in little endian order) from a character array into a decimal equivalent value and returns that value as an unsigned int
-//fileInfo is the character array to read from, highestIndex is the location of the most significant byte you are targetting, numBytes is how many bytes long the value is, and the result of the calculation is stored in newValue
+/*
+This function converts a specified number of bytes (in little endian order) from a character array into a decimal equivalent value and returns that value as an unsigned int
+fileInfo is the character array to read from, highestIndex is the location of the most significant byte you are targetting, numBytes is how many bytes long the value is, and the result of the calculation is stored in newValue
+*/
 unsigned int multiByteHexToDec(unsigned char fileInfo[], short highestIndex, short numBytes, unsigned int * newValue)
 {
     short power = numBytes*2 - 1; //one character takes up 2 hex digits, with the least significant hex digit representing 16^0
@@ -39,8 +43,10 @@ unsigned int multiByteHexToDec(unsigned char fileInfo[], short highestIndex, sho
     return *newValue; //return dereferenced newValue which should be an unsigned int value
 }
 
-//This function is used by traverse when the user specifies the '-l' flag for additional file info
-//function takes two args, one is a character array containing the root entry of the file and the other is also an array with the same info in unsigned int format
+/*
+This function is used by traverse when the user specifies the '-l' flag for additional file info
+function takes two args, one is a character array containing the root entry of the file and the other is also an array with the same info in unsigned int format
+*/
 void traverse2(unsigned int fileInfoDec[], char fileInfo[])
 {
     
@@ -135,24 +141,30 @@ void traverse2(unsigned int fileInfoDec[], char fileInfo[])
     printf("%d", newDecValue);
 }
 
-void fmount(char arg[],char *flops[])
+/*
+Mounts the floppy file or image to be used
+*/
+void fmount(char arg[],char *floppyName[])
 {
-    if(open(arg, O_RDONLY) == -1)//Failed to Open File
-    {
-        printf("\n%s Could Not Be Mounted! (File not found)\n", arg);
-        return;
-    }
-    else//open executed properly
+    if(open(arg, O_RDONLY) != -1)//file opened
     {
         strcpy(*flops,arg);//stores file name in flops to allow for easy unmounting
-        printf("\n%s successfully mounted\n",*flops);
+        printf("\n%s was mounted\n",*floppyName);
+    }
+    else//error, file not opened
+    {
+        printf("\nFile %s could not be found\n", arg);
+        return;
     }
 }
 
-void fumount(char * flops[])
+/*
+Unmounts the floppy
+*/
+void fumount(char * floppyName[])
 {
-    close(*flops);
-    printf("\n%s unmounted\n",*flops);
+    close(*floppyName);
+    printf("\n%s was unmounted\n",*flops);
 }
 
 void structure(char* flag)
@@ -296,17 +308,36 @@ void showsector(char arg[])
         printf("\nInvalid sector number.  Must be a positive integer between 0 and 2879\n");
     printf("\n");
 }
-
-
+/*
+void parseCommand()
+{
+ 
+ 
+}
+void main()
+{
+    bool isRunning = true;
+    
+    while(isRunning)
+    {
+     
+     
+     
+     
+     
+    }
+ 
+}
+*/
 int main()
 {
     const char prompt[] = {"\nflop: "};
-    char *flopname[50];
     short i, j, quit = 0; //loop and sentinel variables
     FILE *fp; //used for output redirection
     short fd; //will hold file descriptor value
     int stdout_copy; //used to hold copy of stdout for output redirection
     short mounted = 0; //indicates if a floppy has been mounted
+    char *flopname[50];
     
     //While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
     while (quit == 0)
