@@ -140,7 +140,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     dayNum = (((monthDay/16)*10) + (monthDay%16)); //convert dayNum to hex
     if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
         dayNum = dayNum % 32;
-    printf("%d/%d/%d \t", monthNum, dayNum, year); //print date
+    printf("%02d/%d/%d \t", monthNum, dayNum, year); //print date
     //TIME
     unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
     unsigned int minSec = fileInfoDec[14]; //lower byte used for minute/second calculation
