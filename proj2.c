@@ -250,20 +250,21 @@ void showfat(char b[])
     for(a = startSector; a <= endSector; ++a)
     {
     	printf("\n\nSector : %d",a);
-    	printf("\n         0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f");
+    	printf("\n          0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f");
         lseek(3, 512*a, SEEK_SET); //changes to the start position of sector 'a' (512 bytes per sector)
         read(3, buffer, 512); //reads 512 bytes (the entire sector) into the buffer
         for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
             if(i % 16 == 0)
                 printf("\n  %03X  ",i);
-            if((unsigned char)buffer[i] == 0)
+            unsigned char buf = (unsigned char)buffer[i] + ((unsigned char)buffer[i+1]/((unsigned char)buffer[i+1]%16));
+            if(buff == 0)
             {
             	printf("FREE ");
             }
             else
             {
-            	printf("%03X  ", (unsigned char)buffer[i]);
+            	printf("%03X  ", buff);
             }
              
         }
