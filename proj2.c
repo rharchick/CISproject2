@@ -349,7 +349,7 @@ int main()
 		///////////////////////////////////////
 		//Execute any commands
 		//////////////////////////////////////
-		if (strcmp(command,"quit") == 0)
+		if (strcmp("quit",command) == 0)
 		{
 			if(mounted == 1)fumount(flopname);
 			isRunning = 0;
@@ -357,14 +357,14 @@ int main()
 		else if (strcmp("help",command) == 0) 
 		{
 			printf("Commands: \n\n ");
-			printf("help -- Displays useable commands \n ");
-			printf("fmount (Argument) -- Mount a floppy disk (argument) \n ");
-			printf("fumount -- Unmount the mounted floppy disk \n ");
-			printf("structure -- Display the structure of a floppy disk \n ");
-			printf("traverse (-l) -- Display the root directory contents (with the option to show more info) \n ");
-			printf("showfat -- Display content of the FAT tables \n ");
-			printf("showsector (sector number) -- Show content of the sector \n ");
-			printf("quit -- Quit out of the floppy shell \n");
+			printf("help 			- Displays useable commands \n ");
+			printf("fmount (Argument) 	- Mount a floppy disk (argument) \n ");
+			printf("fumount 		- Unmount the mounted floppy disk \n ");
+			printf("structure 		- Display the structure of a floppy disk \n ");
+			printf("traverse (-l) 		- Display the root directory contents (with the option to show more info) \n ");
+			printf("showfat 		- Display content of the FAT tables \n ");
+			printf("showsector (sector #) 	- Show content of the sector \n ");
+			printf("quit 			- Quit out of the floppy shell \n");
 		}
 		else if (strcmp(command,"fmount") == 0)
 		{
