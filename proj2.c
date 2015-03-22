@@ -45,104 +45,6 @@ unsigned int multiByteHexToDec(unsigned char fileInfo[], short highestIndex, sho
 }
 
 /*
-This function is used by traverse when the user specifies the '-l' flag for additional file info
-function takes two args, one is a character array containing the root entry of the file and the other is also an array with the same info in unsigned int format
-*/
-void traverse2(unsigned int fileInfoDec[], char fileInfo[])
-{
-    
-    //File type is displayed first
-    char attributes[] = "-----";
-    unsigned int attributeNum = fileInfoDec[11]; //get the attributes byte
-    short i,z; //loop variables
-    if (attributeNum > 15) //if upper 4 bits have a non-zero value, check for archive/subdir status
-    {
-        if (attributeNum < 32)
-            attributes[0] = 'D'; //entry is a subdirectory
-        else if (attributeNum < 48)
-            attributes[1] = 'A'; //entry is an archive file
-        else //any int values that exceed 48 indicate unused or invalid attributes
-        {}
-    }
-    if ((attributeNum % 16) == 0) //if none of the lower bits are set, no other attributes need be examined
-    {}
-    else
-    {
-        attributeNum = (attributeNum % 16);
-        if ((attributeNum % 2) != 0) //if lowest bit is set
-            attributes[2] = 'R'; //file is read-only
-        if (attributeNum == 2 || attributeNum == 3 || attributeNum == 6 || attributeNum == 7 || attributeNum == 10 || attributeNum == 11 || attributeNum >= 14) //if second-lowest bit is set
-            attributes[3] = 'H'; //file is hidden
-        if (attributeNum > 3 && attributeNum < 8 || attributeNum > 11) //if second-highest bit is set
-            attributes[4] = 'S'; //system file
-    }
-    printf("   \t%s  ", attributes); //display file attributes
-    
-    //Next the date is calculated
-    //	printf("Created: ");
-    unsigned int year = 1980; //years begin from 1980
-    unsigned int monthNum = 0;
-    unsigned int dayNum = 0;
-    unsigned int monthDay;
-    unsigned int yearOffset = 0; //variables used to store/calculate the month/day/year the file was created
-    
-    //Calculate year
-    yearOffset = (fileInfoDec[17]/2); //will automatically cast off lowest bit, which is part of month anyway
-    yearOffset = ((yearOffset/16)*10 + yearOffset%16); //convert decimal yearOffset to hex numeric equivalent for adding
-    year = year + yearOffset;
-    
-    //Calculate month
-    monthDay = fileInfoDec[16]; //lower byte is used for month and day calculation
-    monthDay = (monthDay - (monthDay%32)); //cast off the lower 5 bits
-    if (monthDay == 32 || monthDay == 96 || monthDay == 160 || monthDay == 224)
-        monthNum++; //lowest bit set
-    if (monthDay == 64 || monthDay == 96 || monthDay == 192 || monthDay == 224)
-        monthNum = monthNum + 2; //second lowest bit sit
-    if (monthDay > 128)
-        monthNum = monthNum + 4; //highest bit set
-    if(fileInfoDec[17] % 2 != 0) //if there is a remainder of 1, then the lowest bit is set and indicates that the highest bit is set in the month portion
-        monthNum = monthNum + 8;
-    
-    //Calculate Day
-    monthDay = fileInfoDec[16]; //restore monthDay
-    dayNum = (((monthDay/16)*10) + (monthDay%16)); //convert dayNum to hex
-    
-    if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
-        dayNum = dayNum % 32;
-    
-    printf("%d/%d/%d ", monthNum, dayNum, year); //print date
-    
-    //Calculation of time created below
-    unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
-    unsigned int minSec = fileInfoDec[14]; //lower byte used for minute/second calculation
-    
-    //Calculate Hours
-    hourMin = (hourMin/8); //cast off lower 3 bits to obtain hours
-    printf("%02d:", hourMin);
-    
-    //Calculate Minutes
-    hourMin = fileInfoDec[15]; //restore hourMin
-    minSec = (hourMin%8)*8 + (minSec/32); //raise lower 3 bits of hourMin to be upper 3 bits, while upper 3 bits of minSec become lower 3 bits
-    printf("%02d:", minSec);
-    
-    //Calculate Seconds
-    minSec = fileInfoDec[14]; //restore minSec
-    minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
-    printf("%02d | ", minSec);
-    
-    //Calculate File Size
-    //	printf("File Size (bytes): ");
-    unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
-    newDecValue = multiByteHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
-    printf("%d | ", newDecValue);
-    
-    //Calculate first logical sector
-    //	printf("First logical sector: ");
-    newDecValue = multiByteHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
-    printf("%d", newDecValue);
-}
-
-/*
 Mounts the floppy file or image to be used
 */
 void fmount(char arg[],char *floppyName[])
@@ -192,11 +94,11 @@ void structure(char* flag)
 
 void traverse(short flag)
 {
-    short a,y,z; //variables used for loop counters
+    short sector,file,a; //variables used for loop counters
     unsigned char fileInfo[32] = {'\0'}; //char array to store a root entry at a time
     unsigned int fileInfoDec[32] = {'\0'}; //int array will store decimal equivalents of fileInfo characters
     
-        if (flag == 1) {
+    if (flag == 1) {
         printf("\t*****************************\n");
         printf("\t** FILE ATTRIBUTE NOTATION **\n");
         printf("\t**                         **\n");
@@ -207,40 +109,132 @@ void traverse(short flag)
         printf("\t*****************************\n");
     }
     
-    for (a = 19; a < 33; ++a) //reads through sectors 19-32 (root sectors)
+    for (sector = 19; sector < 33; ++sector) //reads through sectors 19-32 (root sectors)
     {
-        lseek(3, 512*a, SEEK_SET); //changes start position to beginning of sector 'a'
-        for (y = 0; y < 16; ++y) //16 file entries per sector
+        lseek(3, 512*sector, SEEK_SET); //changes start position to beginning of sector 'a'
+        for (file = 0; file < 16; ++file) //16 file entries per sector
         {
-            lseek(3, (512*a + y*32), SEEK_SET); //start position is set to beginning of current sector plus y*32 bytes
+            lseek(3, (512*sector + file*32), SEEK_SET); //start position is set to beginning of current sector plus y*32 bytes
             read(3, fileInfo, 32); //reads 32 bytes into file info (FAT12 file systems allocate exactly 32 bytes per root entry)
             if (fileInfo[0] == '\0') //null file entry condition for now
                 continue;
-            for (z = 0; z < 32; ++z) //this for loop casts characters to integers so that certain bits in the file entry can be evaluated properly
-                fileInfoDec[z] = (unsigned int)fileInfo[z];
+            for (a = 0; a < 32; ++a) //this for loop casts characters to integers so that certain bits in the file entry can be evaluated properly
+                fileInfoDec[a] = (unsigned int)fileInfo[a];
             if (fileInfoDec[11] == 15) //IF BIT 11 OF FILE ENTRY IN ROOT IS x0F hex(15 decimal), THEN IT CAN BE IGNORED FOR THIS ASSIGNMENT
                 continue;
             printf("\n/");
+            if (flag == 1) //extended output flag will result in longTraverse function call
+                PrintMoreSectorInfo(fileInfoDec, fileInfo);
             if (fileInfo[11] == 16) //IF ENTRY IS A DIRECTORY
             {
-                for (z = 0; z < 11; ++z)
+                for (a = 0; a < 11; ++a)
                     printf("%c", fileInfo[z]);
                 printf(" <DIR>");
             }
             else //ELSE ENTRY IS A REGULAR FILE
             {
-                for (z = 0; z < 11; ++z)
+                for (a = 0; a < 11; ++a)
                 {
-                    printf("%c", fileInfo[z]);
-                    if (z == 7) //last 3 characters will be the extension, 'appending' a dot after a filename for stylization
+                    printf("%c", fileInfo[a]);
+                    if (a == 7) //last 3 characters will be the extension, 'appending' a dot after a filename for stylization
                         printf(".");
                 }
             }
-            if (flag == 1) //extended output flag will result in longTraverse function call
-                traverse2(fileInfoDec, fileInfo);
         }
     }
     printf("\n");
+}
+/*
+This function is used by traverse when the user specifies the '-l' flag for additional file info
+function takes two args, one is a character array containing the root entry of the file and the other is also an array with the same info in unsigned int format
+*/
+void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
+{
+    //File type is displayed first
+    char attributes[] = "-----";
+    unsigned int attributeNum = fileInfoDec[11]; //get the attributes byte
+    short i,z; //loop variables
+    if (attributeNum > 15) //if upper 4 bits have a non-zero value, check for archive/subdir status
+    {
+        if (attributeNum < 32)
+            attributes[0] = 'D'; //entry is a subdirectory
+        else if (attributeNum < 48)
+            attributes[1] = 'A'; //entry is an archive file
+    }
+    if ((attributeNum % 16) == 0) //other attributes
+    {
+        attributeNum = (attributeNum % 16);
+        if ((attributeNum % 2) != 0) //if lowest bit is set
+            attributes[2] = 'R'; //file is read-only
+        if (attributeNum == 2 || attributeNum == 3 || attributeNum == 6 || attributeNum == 7 || attributeNum == 10 || attributeNum == 11 || attributeNum >= 14) //if second-lowest bit is set
+            attributes[3] = 'H'; //file is hidden
+        if (attributeNum > 3 && attributeNum < 8 || attributeNum > 11) //if second-highest bit is set
+            attributes[4] = 'S'; //system file
+    }
+    printf("   \t%s  ", attributes); //display file attributes
+    
+    //Next the date is calculated
+    //	printf("Created: ");
+    unsigned int year = 1980; //years begin from 1980
+    unsigned int monthNum = 0;
+    unsigned int dayNum = 0;
+    unsigned int monthDay;
+    unsigned int yearOffset = 0; //variables used to store/calculate the month/day/year the file was created
+    
+    //Calculate year
+    yearOffset = (fileInfoDec[17]/2); //will automatically cast off lowest bit, which is part of month anyway
+    yearOffset = ((yearOffset/16)*10 + yearOffset%16); //convert decimal yearOffset to hex numeric equivalent for adding
+    year = year + yearOffset;
+    
+    //Calculate month
+    monthDay = fileInfoDec[16]; //lower byte is used for month and day calculation
+    monthDay = (monthDay - (monthDay%32)); //cast off the lower 5 bits
+    if (monthDay == 32 || monthDay == 96 || monthDay == 160 || monthDay == 224)
+        monthNum++; //lowest bit set
+    if (monthDay == 64 || monthDay == 96 || monthDay == 192 || monthDay == 224)
+        monthNum = monthNum + 2; //second lowest bit sit
+    if (monthDay > 128)
+        monthNum = monthNum + 4; //highest bit set
+    if(fileInfoDec[17] % 2 != 0) //if there is a remainder of 1, then the lowest bit is set and indicates that the highest bit is set in the month portion
+        monthNum = monthNum + 8;
+    
+    //Calculate Day
+    monthDay = fileInfoDec[16]; //restore monthDay
+    dayNum = (((monthDay/16)*10) + (monthDay%16)); //convert dayNum to hex
+    
+    if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
+        dayNum = dayNum % 32;
+    
+    printf("%d/%d/%d /t", monthNum, dayNum, year); //print date
+    
+    //Calculation of time created below
+    unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
+    unsigned int minSec = fileInfoDec[14]; //lower byte used for minute/second calculation
+    
+    //Calculate Hours
+    hourMin = (hourMin/8); //cast off lower 3 bits to obtain hours
+    printf("%02d:", hourMin);
+    
+    //Calculate Minutes
+    hourMin = fileInfoDec[15]; //restore hourMin
+    minSec = (hourMin%8)*8 + (minSec/32); //raise lower 3 bits of hourMin to be upper 3 bits, while upper 3 bits of minSec become lower 3 bits
+    printf("%02d:", minSec);
+    
+    //Calculate Seconds
+    minSec = fileInfoDec[14]; //restore minSec
+    minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
+    printf("%02d /t/t", minSec);
+    
+    //Calculate File Size
+    //	printf("File Size (bytes): ");
+    unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
+    newDecValue = multiByteHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
+    printf("%d/t/t", newDecValue);
+    
+    //Calculate first logical sector
+    //	printf("First logical sector: ");
+    newDecValue = multiByteHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
+    printf("%d", newDecValue);
 }
 
 void showfat(char b[])
