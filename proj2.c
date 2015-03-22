@@ -106,7 +106,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     if (attributeNum > 15) //if upper 4 bits have a non-zero value, check for archive/subdir status
     {
         if (attributeNum < 32)//Subdirectory
-            attributes[0] = '-'; 
+            attributes[0] = 'D'; 
         else if (attributeNum < 48)//Archive
             attributes[1] = 'A'; 
     }
@@ -140,7 +140,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     dayNum = (((monthDay/16)*10) + (monthDay%16)); //convert dayNum to hex
     if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
         dayNum = dayNum % 32;
-    printf("%02d/%d/%d \t", monthNum, dayNum, year); //print date
+    printf("%d/%d/%d \t", monthNum, dayNum, year); //print date
     //TIME
     unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
     unsigned int minSec = fileInfoDec[14]; //lower byte used for minute/second calculation
@@ -172,7 +172,6 @@ void traverse(short flag)
     unsigned int fileInfoDec[32] = {'\0'}; //int array will store decimal equivalents of fileInfo characters
     
     if (flag == 1) {
-        printf("\n");
         printf("*****************************\n");
         printf("** FILE ATTRIBUTE NOTATION **\n");
         printf("**                         **\n");
@@ -181,7 +180,7 @@ void traverse(short flag)
         printf("** H ------ HIDDEN FILE    **\n");
         printf("** A ------ ARCHIVE FILE   **\n");
         printf("*****************************\n");
-        printf("ATTRIB\t\tDATE\t\tTIME\tSIZE\tSECTOR\tNAME");
+        printf("ATTRIB\tDATE\t\tTIME\t\tSIZE\tSECTOR\tNAME");
     }
     
     for (sector = 19; sector < 33; ++sector) //reads through sectors 19-32 (root sectors)
@@ -197,13 +196,12 @@ void traverse(short flag)
                 fileInfoDec[a] = (unsigned int)fileInfo[a];
             if (fileInfoDec[11] == 15) //IF BIT 11 OF FILE ENTRY IN ROOT IS x0F hex(15 decimal), THEN IT CAN BE IGNORED FOR THIS ASSIGNMENT
                 continue;
-            printf("\n");
+            printf("\n/");
             if (flag == 1) //extended output flag will result in longTraverse function call
                 PrintMoreSectorInfo(fileInfoDec, fileInfo);
             //DIRECTORY
-            if (fileInfo[11] == 16)
+            if (fileInfo[11] == 16) //IF ENTRY IS A DIRECTORY
             {
-                printf("/");
                 for (a = 0; a < 11; ++a)
                     printf("%c", fileInfo[a]);
                 printf("\t<DIR>");
@@ -211,7 +209,6 @@ void traverse(short flag)
             //REGULAR FILE
             else
             {
-                printf("/");
                 for (a = 0; a < 11; ++a)
                 {
                     if(fileInfo[a]!=' ')printf("%c", fileInfo[a]);
@@ -227,7 +224,7 @@ void traverse(short flag)
 void showfat(char b[])
 {
     short a = atoi(b); //cast argument to an integer
-    short y; //variable to be used as loop counter
+    short i; //variable to be used as loop counter
     short startSector, endSector = 0; //will indicate which fat sectors to read between
     char buffer[512] = {'\0'}; //buffer stores a sector at a time
     
@@ -235,31 +232,31 @@ void showfat(char b[])
     {
         startSector = 1;
         endSector = 9;
-        printf("\n\n1st FAT Table:\n");
+        printf("\n\nFAT Table 1:\n");
     }
     else if (a == 2) //2nd fat table, sectors 10-18
     {
         startSector = 10;
         endSector = 18;
-        printf("\n\n2nd FAT Table:\n");
+        printf("\n\nFAT Table 2:\n");
     }
     else //if not specified, both are printed, 1-18
     {
         startSector = 1;
         endSector = 18;
-        printf("\n\nDisplaying both FAT tables: \n");
+        printf("\n\nFAT table 1 and 2: \n");
     }
     
-    for(a = startSector; a <= endSector; ++a) //loop through sectors 1-18
+    for(a = startSector; a <= endSector; ++a)
     {
         lseek(3, 512*a, SEEK_SET); //changes to the start position of sector 'a' (512 bytes per sector)
         read(3, buffer, 512); //reads 512 bytes (the entire sector) into the buffer
         printf("\n");
-        for(y = 0; y < 512; ++y) //prints each character read in as hex values, rows of 16
+        for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
-            if(y % 16 == 0)
+            if(i % 16 == 0)
                 printf("\n     ");
-            printf("%02X ", (unsigned char)buffer[y]); //casts to unsigned to avoid leading F's in certain characters
+            printf("%02X ", (unsigned char)buffer[i]); //casts to unsigned to avoid leading F's in certain characters
         }
     }
     printf("\n");
@@ -270,146 +267,94 @@ void showsector(char arg[])
     int sectorNum = atoi(arg); //cast arg to an int
     if(sectorNum >= 0 && sectorNum < 2880) //if the argument is a valid floppy sector
     {
-        printf("\nDisplaying sector %s...(row/column numbers included)\n", arg);
+        printf("\nSector : %s\n", arg);
         char buffer[512] = {'\0'};
         sectorNum = atoi(arg); //convert the user argument to an int
         lseek(3, 512*sectorNum, SEEK_SET); //reposition file reader to correct sector
         read(3, buffer, 512); //read 512 bytes (the full sector) into the character buffer
         printf("\n       0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
-        int y;
-        for(y = 0; y < 512; ++y) //prints each character read in as hex values, rows of 16
+        int i;
+        for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
-            if(y % 16 == 0) //print row number
+            if(i % 16 == 0) //print row number
             {
-                printf("\n  %03X  ", y);
+                printf("\n  %03X  ", i);
             }
-            printf("%02X ", (unsigned char)buffer[y]); //casts to unsigned to avoid leading F's in certain characters
+            printf("%02X ", (unsigned char)buffer[i]); //casts to unsigned to avoid leading F's in certain characters
         }
     }
     else
-        printf("\nInvalid sector number.  Must be a positive integer between 0 and 2879\n");
+    {
+        printf("\nSector must be between 0 and 2879\n");
+    }
     printf("\n");
 }
-
-/*
-void main()
-{
-    short isRunning = 1;
-    short mounted = 0;
-    const char prompt[] = {"\nflop: "};
-    
-    const int bufsize = 100;
-    char *floppyName[bufsize];
-    
-    //output redirection
-    FILE *filePointer;
-    short fileDesc;
-    int stdout_copy;
-
-    
-    while (isRunning)
-    {
-        //Variables are re-declared for every loop iteration as a means to 'clear' previous values
-        char commands[5][bufsize];
-        char input[bufsize] = {'\0'}; //used for storing user input commands
-        int inputsize;
-        char *arg1 = malloc(bufsize); //used for storing arguments that users pass to commands
-        char command[bufsize] = {'\0'};
-        char filename[bufsize] = {'\0'};
-        short go, redirect, flagValue = 0;
-        char flagcommand[bufsize] = {'\0'};
-        
-        
-        printf(prompt);
-
-        
-        inputsize = read(0, input, sizeof(input) - 1);
-        input[bufsize] = '\0';
-        
-        int curcommand = 0;
-        int curplace = 0;
-        int a = 0;
-        for(a; a<bufsize; a++)
-        {
-            input[a] = tolower(input[a]);
-            if(input[a] == ' ' && curcommand < 5)
-            {
-                memcpy( command[curcommand], &input[curplace], a-curplace );
-                command[curcommand][a-curplace] = '/0';
-                curplace = a;
-                ++curcommand;
-            }
-        }
-        int z = 0;
-        for(z;z<10;z++)
-        {
-            printf("/n %s",command[z]);
-            
-        }
-        if(curcommand > 0)isRunning = 0;
-    }
-}
-*/
 int main()
 {
-	const char prompt[] = {"\nflop: "};
+	const char prompt[] = {"\n:floppy: "};
 	char *flopname[50];
-	short i, j, quit = 0; //loop and sentinel variables
+	short i, isRunning = 1; //loop and sentinel variables
 	short mounted = 0; //indicates if a floppy has been mounted
 	
 	//While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
-	while (quit == 0)
+	while (isRunning == 1)
 	{
-		//Variables are re-declared for every loop iteration as a means to 'clear' previous values
-		
-		//Words: This is going to be a multidemensional array to help split up to 10 inputs, including the extra flags!
-		//words[0] = input
-		//words[1] = 
-		char words[10][20];
-		char input[50] = {'\0'}; //used for storing user input commands
-		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
-		char command[30] = {'\0'};
-		char filename[30] = {'\0'};
-		short go, flagValue = 0;
-		char flagcommand[30] = {'\0'};
-		
-		i = 0;
 		printf(prompt);
+		
+		char words[10][20];
+		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
+		short flagged = 0;
+		i = 0;
+		
+		char input[50],command[30],filename[30],flagcommand[30];
+		input[0] = '\0';
+		command[0] = '\0';
+		filename[0] = '\0';
+		flagcommand[0] = '\0';
+		
+		//get the input
 		fgets(input, 50, stdin);
 		//Cast input to lowercase
+		int j;
 		for(j = 0; input[j] != '\0' && j<50; j++)input[j] = tolower(input[j]);
 		
 		char* token;
 		const char s[2] = " \n";
-		   
-		/* get the first token */
+		//get the tokens
 		token = strtok(input, s);
 		strcpy(words[i],token);
-		/* walk through other tokens */
 		while( token != NULL ) 
 		{
-			i++;
 			token = strtok(NULL, s);
+			i++;
 			if(token != NULL)strcpy(words[i],token);
 		}
 		strcpy(words[i], "");
-
-		strcpy(command, words[0]);//Copies the first input into command, this is the most important one
+		//get the first command
+		strcpy(command, words[0]);
 		i = 1; //starts at second word
-		while(strcmp(words[i],"") != 0)//as long as THEY ARE NOT EQUAL
+		while(strcmp(words[i],"") != 0)
 		{
-			if(strcmp(words[i],"-l") == 0)//word is a flag....
-				flagValue = 1;
-			else //means its a word...more case checks!!!
+			if(strcmp(words[i],"-l") == 0)
 			{
-				if(flagValue == 1)strcpy(flagcommand,words[i]);// word after flag
+				flagged = 1;
+			}
+			else
+			{
+				if(flagged == 1)strcpy(flagcommand,words[i]);
 				strcpy(arg1,words[i]);
-				go = 1;
 			}
 			i++;
 		}
-		//Basically serves as a 'switch' statement to check the command entered against the valid list of commands
-		if (strcmp("help",command) == 0) 
+		///////////////////////////////////////
+		//Execute any commands
+		//////////////////////////////////////
+		if (strcmp(command,"quit") == 0)
+		{
+			if(mounted == 1)fumount(flopname);
+			isRunning = 0;
+		}
+		else if (strcmp("help",command) == 0) 
 		{
 			printf("Commands: \n\n ");
 			printf("help -- Displays useable commands \n ");
@@ -438,24 +383,26 @@ int main()
 				printf("\nFirst mount a floppy disk\n");
 			}
 		}
-		else if (strcmp(command,"quit") == 0)
+		else if (strcmp(command,"structure") == 0 && mounted == 1)
 		{
-			if(mounted==1)fumount(flopname);
-			quit = 1;
-		}
-		else if (mounted == 0) //all commands below this point require a mounted floppy to execute; this prevents reading from an empty fd
-			printf("\nPlease first mount a floppy disk using fmount\n");
-		else if (strcmp(command,"structure") == 0)
 			structure();
-		else if (strcmp(command,"traverse") == 0)
-			traverse(flagValue);
-		else if (strcmp(command,"showfat") == 0)
+		}
+		else if (strcmp(command,"traverse") == 0 && mounted == 1)
+		{
+			traverse(flagged);
+		}
+		else if (strcmp(command,"showfat") == 0 && mounted == 1)
+		{
 			showfat(arg1);
-		else if (strcmp(command,"showsector") == 0)
+		}
+		else if (strcmp(command,"showsector") == 0 && mounted == 1)
+		{
 			showsector(arg1);
+		}
 		else
-			printf("\nThe command '%s' is invalid.  Type 'help' for a list of commands.", command);
-
+		{
+			printf("\nThe command '%s' is invalid or you have no floppy disk mounted.  Type 'help' for a list of commands.", command);
+		}
 	}
 	return 0;
 }
