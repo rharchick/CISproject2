@@ -84,7 +84,7 @@ void structure(char* flag)
     newDecValue = multiByteHexToDec(bootSector, 18, 2, &newDecValue); //convert bytes 17 to 18 from chars to an integer total
     printf("\n# of ROOT Entries: 		%d", newDecValue);
     newDecValue = multiByteHexToDec(bootSector, 12, 2, &newDecValue); //convert bytes 11 to 12 from chars to an integer total
-    printf("\n# of bytes per sector: 	%d\n", newDecValue);
+    printf("\n# of bytes per sector: 	%d\n\n", newDecValue);
     printf("Sector #   		Sector Types\n");
     printf("----------		----------");
     printf("0			BOOT\n");
@@ -140,7 +140,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     dayNum = (((monthDay/16)*10) + (monthDay%16)); //convert dayNum to hex
     if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
         dayNum = dayNum % 32;
-    printf("%d/%d/%d /t", monthNum, dayNum, year); //print date
+    printf("%d/%d/%d \t", monthNum, dayNum, year); //print date
     //TIME
     unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
     unsigned int minSec = fileInfoDec[14]; //lower byte used for minute/second calculation
@@ -154,12 +154,12 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     //SECONDS
     minSec = fileInfoDec[14]; //restore minSec
     minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
-    printf("%02d /t/t", minSec);
+    printf("%02d \t\t", minSec);
     
     //File Size
     unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
     newDecValue = multiByteHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
-    printf("%d/t/t", newDecValue);
+    printf("%d\t\t", newDecValue);
     //First Sector
     newDecValue = multiByteHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
     printf("%d", newDecValue);
