@@ -256,7 +256,7 @@ void showfat(char b[])
         for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
             if(i % 16 == 0)
-                printf("\n  %03X  ");
+                printf("\n  %03X  ",i);
             printf("%03X ", (unsigned char)buffer[i]); //casts to unsigned to avoid leading F's in certain characters
         }
     }
@@ -306,12 +306,10 @@ int main()
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
 		short flagged = 0;
 		i = 0;
-		
-		char input[50],command[30],filename[30],flagcommand[30];
-		input[0] = '\0';
-		command[0] = '\0';
-		filename[0] = '\0';
-		flagcommand[0] = '\0';
+		char input[50] = {'\0'};
+		char command[50] = {'\0'};
+		char filename[50] = {'\0'};
+		char flagcommand[50] = {'\0'};
 		
 		//get the input
 		fgets(input, 50, stdin);
