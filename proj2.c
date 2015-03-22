@@ -257,16 +257,14 @@ void showfat(char b[])
         {
             if(i % 16 == 0)
                 printf("\n  %03X  ",i);
-            unsigned char buf = (unsigned char)buffer[i] + ((unsigned char)buffer[i+1]/((unsigned char)buffer[i+1]%16));
-            if(buf == 0)
+            if((unsigned char)buffer[i] == 0)
             {
             	printf("FREE ");
             }
             else
             {
-            	printf("%03X  ", buf);
+            	printf("%03X  ", (unsigned char)buffer[i]);
             }
-             
         }
     }
     printf("\n");
