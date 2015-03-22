@@ -246,14 +246,15 @@ void showfat(char b[])
         endSector = 18;
         printf("\n\nFAT table 1 and 2: \n");
     }
-    printf("         0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f");
-   
+    
     for(a = startSector; a <= endSector; ++a)
     {
+    	printf("Sector : %d",a);
+    	printf("         0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f");
         lseek(3, 512*a, SEEK_SET); //changes to the start position of sector 'a' (512 bytes per sector)
         read(3, buffer, 512); //reads 512 bytes (the entire sector) into the buffer
-        printf("\nSector:%d\n",a);
-        for(i = 2; i < 512; ++i) //prints each character read in as hex values, rows of 16
+        printf("\n ");
+        for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
             if(i % 16 == 0)
                 printf("\n  %03X  ",i);
@@ -370,7 +371,7 @@ int main()
 				mounted = 0;//no disc mounted
 			}
 			else
-				printf("\nNo Floppy Disc Has Been Mounted\n");
+				printf("\nNo Floppy mounted\n");
 		}
 		else if (strcmp(command,"quit") == 0)
 		{
@@ -379,7 +380,7 @@ int main()
 			isQuitting = 1;
 		}
 		else if (mounted == 0) //all commands below this point require a mounted floppy to execute; this prevents reading from an empty fd
-			printf("\nNo Floppy Disc Has Been Mounted, or invalid command has been entered.\n");
+			printf("\nThe command '%s' is invalid or you have no floppy disk mounted. Type 'help' for a list of commands.", command);
 		else if (strcmp(command,"structure") == 0)
 			structure();
 		else if (strcmp(command,"traverse") == 0)
@@ -389,122 +390,9 @@ int main()
 		else if (strcmp(command,"showsector") == 0)
 			showsector(arg1);
 		else
-			printf("\nThe command '%s' is invalid or you have no floppy disk mounted.  Type 'help' for a list of commands.", command);
+			printf("\nThe command '%s' is invalid. Type 'help' for a list of commands.", command);
 
 	}
 	return 0;
-	/*
-	const char prompt[] = {"\n:floppy: "};
-	char *flopname[50];
-	short i, isRunning = 1; //loop and sentinel variables
-	short mounted = 0; //indicates if a floppy has been mounted
-	
-	//While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
-	while (isRunning == 1)
-	{
-		printf(prompt);
-		
-		char words[10][20];
-		char input[50] = {'\0'}; //used for storing user input commands
-		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
-		char command[30] = {'\0'};
-		char filename[30] = {'\0'};
-		char flagcommand[30] = {'\0'};
-		short flagged = 0;
-		
-		//get the input
-		fgets(input, 50, stdin);
-		//Cast input to lowercase
-		int j;
-		for(j = 0; input[j] != '\0' && j<50; j++) input[j] = tolower(input[j]);
-		
-		char* token;
-		const char s[2] = " \n";
-		//get the tokens
-		token = strtok(input, s);
-		strcpy(words[i],token);
-		while( token != NULL ) 
-		{
-			token = strtok(NULL, s);
-			i++;
-			if(token != NULL)strcpy(words[i],token);
-		}
-		strcpy(words[i], "");
-		//get the first command
-		strcpy(command, words[0]);
-		i = 1; //starts at second word
-		while(strcmp(words[i],"") != 0)
-		{
-			if(strcmp(words[i],"-l") == 0)
-			{
-				flagged = 1;
-			}
-			else
-			{
-				if(flagged == 1)strcpy(flagcommand,words[i]);
-				strcpy(arg1,words[i]);
-			}
-			i++;
-		}
-		///////////////////////////////////////
-		//Execute any commands
-		//////////////////////////////////////
-		if (strcmp(command,"quit") == 0)
-		{
-			if(mounted == 1)fumount(flopname);
-			isRunning = 0;
-		}
-		else if (strcmp(command,"help") == 0) 
-		{
-			printf("Commands: \n\n ");
-			printf("help 			- Displays useable commands \n ");
-			printf("fmount (Argument) 	- Mount a floppy disk (argument) \n ");
-			printf("fumount 		- Unmount the mounted floppy disk \n ");
-			printf("structure 		- Display the structure of a floppy disk \n ");
-			printf("traverse (-l) 		- Display the root directory contents (with the option to show more info) \n ");
-			printf("showfat 		- Display content of the FAT tables \n ");
-			printf("showsector (sector #) 	- Show content of the sector \n ");
-			printf("quit 			- Quit out of the floppy shell \n");
-		}
-		else if (strcmp(command,"fmount") == 0)
-		{
-			mounted = 1;
-			fmount(arg1,flopname);
-		}
-		else if (strcmp(command,"fumount") == 0)
-		{
-			if(mounted == 1)
-			{
-				fumount(flopname);
-				mounted = 0;//no disc mounted
-			}
-			else
-			{
-				printf("\nFirst mount a floppy disk\n");
-			}
-		}
-		else if (strcmp(command,"structure") == 0 && mounted == 1)
-		{
-			structure();
-		}
-		else if (strcmp(command,"traverse") == 0 && mounted == 1)
-		{
-			traverse(flagged);
-		}
-		else if (strcmp(command,"showfat") == 0 && mounted == 1)
-		{
-			showfat(arg1);
-		}
-		else if (strcmp(command,"showsector") == 0 && mounted == 1)
-		{
-			showsector(arg1);
-		}
-		else
-		{
-			printf("\nThe command '%s' is invalid or you have no floppy disk mounted.  Type 'help' for a list of commands.", command);
-		}
-	}
-	return 0;
-	*/
 }
 
