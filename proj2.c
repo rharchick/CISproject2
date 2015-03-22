@@ -70,7 +70,7 @@ void fumount(char * floppyName[])
     printf("\n%s was unmounted\n",*floppyName);
 }
 
-void structure(char* flag)
+void structure()
 {
     unsigned char bootSector[62] = {'\0'};
     unsigned int newDecValue = 0; //used to hold return values from multiByteHexToDec
@@ -86,7 +86,7 @@ void structure(char* flag)
     newDecValue = multiByteHexToDec(bootSector, 12, 2, &newDecValue); //convert bytes 11 to 12 from chars to an integer total
     printf("\n# of bytes per sector: 	%d\n\n", newDecValue);
     printf("Sector #   		Sector Types\n");
-    printf("----------		----------");
+    printf("----------		----------\n");
     printf("0			BOOT\n");
     printf("01 -- 09		FAT1\n");
     printf("10 -- 18		FAT2\n");
@@ -172,14 +172,15 @@ void traverse(short flag)
     unsigned int fileInfoDec[32] = {'\0'}; //int array will store decimal equivalents of fileInfo characters
     
     if (flag == 1) {
-        printf("\t*****************************\n");
-        printf("\t** FILE ATTRIBUTE NOTATION **\n");
-        printf("\t**                         **\n");
-        printf("\t** R ------ READ ONLY FILE **\n");
-        printf("\t** S ------ SYSTEM FILE    **\n");
-        printf("\t** H ------ HIDDEN FILE    **\n");
-        printf("\t** A ------ ARCHIVE FILE   **\n");
-        printf("\t*****************************\n");
+        printf("*****************************\n");
+        printf("** FILE ATTRIBUTE NOTATION **\n");
+        printf("**                         **\n");
+        printf("** R ------ READ ONLY FILE **\n");
+        printf("** S ------ SYSTEM FILE    **\n");
+        printf("** H ------ HIDDEN FILE    **\n");
+        printf("** A ------ ARCHIVE FILE   **\n");
+        printf("*****************************\n");
+        printf("ATTRIB\tDATE\tTIME\tSIZE\tSECTOR\tNAME");
     }
     
     for (sector = 19; sector < 33; ++sector) //reads through sectors 19-32 (root sectors)
@@ -198,13 +199,15 @@ void traverse(short flag)
             printf("\n/");
             if (flag == 1) //extended output flag will result in longTraverse function call
                 PrintMoreSectorInfo(fileInfoDec, fileInfo);
+            //DIRECTORY
             if (fileInfo[11] == 16) //IF ENTRY IS A DIRECTORY
             {
                 for (a = 0; a < 11; ++a)
                     printf("%c", fileInfo[a]);
                 printf("\t<DIR>");
             }
-            else //ELSE ENTRY IS A REGULAR FILE
+            //REGULAR FILE
+            else
             {
                 for (a = 0; a < 11; ++a)
                 {
@@ -217,7 +220,6 @@ void traverse(short flag)
     }
     printf("\n");
 }
-
 
 void showfat(char b[])
 {
@@ -350,9 +352,6 @@ int main()
 	const char prompt[] = {"\nflop: "};
 	char *flopname[50];
 	short i, j, quit = 0; //loop and sentinel variables
-	FILE *fp; //used for output redirection
-	short fd; //will hold file descriptor value
-	int stdout_copy; //used to hold copy of stdout for output redirection
 	short mounted = 0; //indicates if a floppy has been mounted
 	
 	//While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
@@ -368,14 +367,14 @@ int main()
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
 		char command[30] = {'\0'};
 		char filename[30] = {'\0'};
-		short go, redirect, flagValue = 0;
+		short go, flagValue = 0;
 		char flagcommand[30] = {'\0'};
 		
 		i = 0;
 		printf(prompt);
 		fgets(input, 50, stdin);
-		for(j = 0; input[j] != '\0' && j<50; j++)//Cast input to lowercase. Avoids complication with lower-case and upper-case arguments
-			input[j] = tolower(input[j]);
+		//Cast input to lowercase
+		for(j = 0; input[j] != '\0' && j<50; j++)input[j] = tolower(input[j]);
 		
 		char* token;
 		const char s[2] = " \n";
@@ -385,14 +384,12 @@ int main()
 		strcpy(words[i],token);
 		/* walk through other tokens */
 		while( token != NULL ) 
-			{
-				i++;
-				token = strtok(NULL, s);
-				if(token != NULL)
-					strcpy(words[i],token);
-			}
-			strcpy(words[i], "");
-		   //TIME TO TRAVERSE THE INPUTS!!!
+		{
+			i++;
+			token = strtok(NULL, s);
+			if(token != NULL)strcpy(words[i],token);
+		}
+		strcpy(words[i], "");
 
 		strcpy(command, words[0]);//Copies the first input into command, this is the most important one
 		i = 1; //starts at second word
@@ -400,40 +397,26 @@ int main()
 		{
 			if(strcmp(words[i],"-l") == 0)//word is a flag....
 				flagValue = 1;
-			else if(strcmp(words[i],">") == 0)//output redirection
-				redirect = 1;
 			else //means its a word...more case checks!!!
 			{
-				if(flagValue == 1)// this word comes after the flag...
-					strcpy(flagcommand,words[i]);
-				if(redirect == 1)
-				{
-					strcpy(filename,words[i]);//this word is the file to redirect to
-					stdout_copy = dup(1); //redirect standard output to user specified local file
-					close(1);
-					fd = open(filename,O_RDWR | O_CREAT);
-					break; //anything after the redirect operator (besides the filename) will be ignored
-				}
-				else//this is another word
-				{
-					strcpy(arg1,words[i]);
-					go = 1;
-				}
+				if(flagValue == 1)strcpy(flagcommand,words[i]);// word after flag
+				strcpy(arg1,words[i]);
+				go = 1;
 			}
 			i++;
 		}
 		//Basically serves as a 'switch' statement to check the command entered against the valid list of commands
 		if (strcmp("help",command) == 0) 
 		{
-			printf("SUPPORTED COMMANDS: \n\n ");
-			printf("HELP -- Display a list of supported commands \n ");
-			printf("FMOUNT [Argument] -- Mount a local floppy disk (argument) \n ");
-			printf("FUMOUNT -- Unmount the mounted floppy disk \n ");
-			printf("STRUCTURE -- Display the structure of a floppy disk \n ");
-			printf("TRAVERSE [-l] -- Display the root directory contents \n ");
-			printf("SHOWFAT -- Display content of the FAT tables \n ");
-			printf("SHOWSECTOR [SectorNumber] -- Show content of specified sector \n ");
-			printf("QUIT -- Quit the floppy shell \n");
+			printf("Commands: \n\n ");
+			printf("help -- Displays useable commands \n ");
+			printf("fmount (Argument) -- Mount a floppy disk (argument) \n ");
+			printf("fumount -- Unmount the mounted floppy disk \n ");
+			printf("structure -- Display the structure of a floppy disk \n ");
+			printf("traverse (-l) -- Display the root directory contents (with the option to show more info) \n ");
+			printf("showfat -- Display content of the FAT tables \n ");
+			printf("showsector (sector number) -- Show content of the sector \n ");
+			printf("quit -- Quit out of the floppy shell \n");
 		}
 		else if (strcmp(command,"fmount") == 0)
 		{
@@ -448,18 +431,17 @@ int main()
 				mounted = 0;//no disc mounted
 			}
 			else
-				printf("\nNo Floppy Disc Has Been Mounted\n");
+				printf("\nFirst mount a floppy disk\n");
 		}
 		else if (strcmp(command,"quit") == 0)
 		{
-			if(mounted==1)
-				fumount(flopname);
+			if(mounted==1)fumount(flopname);
 			quit = 1;
 		}
 		else if (mounted == 0) //all commands below this point require a mounted floppy to execute; this prevents reading from an empty fd
-			printf("\nNo Floppy Disc Has Been Mounted, or invalid command has been entered.\n");
+			printf("\nPlease first mount a floppy disk using fmount\n");
 		else if (strcmp(command,"structure") == 0)
-			structure(flagcommand);
+			structure();
 		else if (strcmp(command,"traverse") == 0)
 			traverse(flagValue);
 		else if (strcmp(command,"showfat") == 0)
@@ -467,15 +449,8 @@ int main()
 		else if (strcmp(command,"showsector") == 0)
 			showsector(arg1);
 		else
-			printf("\nInvalid command '%s' entered.  Type 'help' for a list of commands.", command);
-			
-		if (redirect) //if output was redirected
-		{
-			close(fd); //restore the standard output
-			dup2(stdout_copy, 1);
-			close(stdout_copy);
-			redirect = 0;
-		}
+			printf("\nThe command '%s' is invalid.  Type 'help' for a list of commands.", command);
+
 	}
 	return 0;
 }
