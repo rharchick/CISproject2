@@ -393,10 +393,12 @@ int main()
 		}
 		else if (strcmp(command,"showfat") == 0 && mounted == 1)
 		{
+			printf(command);
 			showfat(arg1);
 		}
 		else if (strcmp(command,"showsector") == 0 && mounted == 1)
 		{
+			printf(command);
 			showsector(arg1);
 		}
 		else
