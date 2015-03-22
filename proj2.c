@@ -154,7 +154,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     //SECONDS
     minSec = fileInfoDec[14]; //restore minSec
     minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
-    printf("%02d \t\t", minSec);
+    printf("%02d \t", minSec);
     
     //File Size
     unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
@@ -181,7 +181,7 @@ void traverse(short flag)
         printf("** H ------ HIDDEN FILE    **\n");
         printf("** A ------ ARCHIVE FILE   **\n");
         printf("*****************************\n");
-        printf("ATTRIB\tDATE\t\tTIME\t\t\tSIZE\tSECTOR\tNAME\n");
+        printf("ATTRIB\t\tDATE\t\tTIME\tSIZE\tSECTOR\tNAME");
     }
     
     for (sector = 19; sector < 33; ++sector) //reads through sectors 19-32 (root sectors)
