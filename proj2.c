@@ -140,6 +140,8 @@ void traverse(short flag)
                         printf(".");
                 }
             }
+            if (lflag == 1) //extended output flag will result in longTraverse function call
+                PrintMoreSectorInfo(fileInfoDec, fileInfo);
         }
     }
     printf("\n");
@@ -157,7 +159,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     if (attributeNum > 15) //if upper 4 bits have a non-zero value, check for archive/subdir status
     {
         if (attributeNum < 32)
-            attributes[0] = 'D'; //entry is a subdirectory
+            attributes[0] = '-'; //entry is a subdirectory
         else if (attributeNum < 48)
             attributes[1] = 'A'; //entry is an archive file
     }
@@ -205,7 +207,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     if (dayNum > 32) //day must be 31 or less, if it is not already then the remainder is the correct day
         dayNum = dayNum % 32;
     
-    printf("%d/%d/%d /t", monthNum, dayNum, year); //print date
+    printf("%02d/%d/%d /t", monthNum, dayNum, year); //print date
     
     //Calculation of time created below
     unsigned int hourMin = fileInfoDec[15]; //upper byte used for hour/minute calculation
