@@ -84,7 +84,7 @@ void structure()
     newDecValue = multiByteHexToDec(bootSector, 18, 2, &newDecValue); //convert bytes 17 to 18 from chars to an integer total
     printf("\n# of ROOT Entries: 		%d", newDecValue);
     newDecValue = multiByteHexToDec(bootSector, 12, 2, &newDecValue); //convert bytes 11 to 12 from chars to an integer total
-    printf("\n# of bytes per sector: 	%d\n\n", newDecValue);
+    printf("\n# of bytes per sector: 		%d\n\n", newDecValue);
     printf("Sector #   		Sector Types\n");
     printf("----------		----------\n");
     printf("0			BOOT\n");
@@ -154,7 +154,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     //SECONDS
     minSec = fileInfoDec[14]; //restore minSec
     minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
-    printf("%02d \t", minSec);
+    printf("%02d \t\t", minSec);
     
     //File Size
     unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
