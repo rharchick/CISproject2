@@ -197,12 +197,13 @@ void traverse(short flag)
                 fileInfoDec[a] = (unsigned int)fileInfo[a];
             if (fileInfoDec[11] == 15) //IF BIT 11 OF FILE ENTRY IN ROOT IS x0F hex(15 decimal), THEN IT CAN BE IGNORED FOR THIS ASSIGNMENT
                 continue;
-            printf("\n/");
+            printf("\n");
             if (flag == 1) //extended output flag will result in longTraverse function call
                 PrintMoreSectorInfo(fileInfoDec, fileInfo);
             //DIRECTORY
-            if (fileInfo[11] == 16) //IF ENTRY IS A DIRECTORY
+            if (fileInfo[11] == 16)
             {
+                printf("/");
                 for (a = 0; a < 11; ++a)
                     printf("%c", fileInfo[a]);
                 printf("\t<DIR>");
@@ -210,6 +211,7 @@ void traverse(short flag)
             //REGULAR FILE
             else
             {
+                printf("/");
                 for (a = 0; a < 11; ++a)
                 {
                     if(fileInfo[a]!=' ')printf("%c", fileInfo[a]);
