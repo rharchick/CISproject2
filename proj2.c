@@ -128,7 +128,7 @@ void traverse(short flag)
             if (fileInfo[11] == 16) //IF ENTRY IS A DIRECTORY
             {
                 for (a = 0; a < 11; ++a)
-                    printf("%c", fileInfo[z]);
+                    printf("%c", fileInfo[a]);
                 printf(" <DIR>");
             }
             else //ELSE ENTRY IS A REGULAR FILE
