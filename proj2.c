@@ -302,20 +302,20 @@ int main()
 	{
 		printf(prompt);
 		
-		char words[10][20];
+		char words[10][40];
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
 		short flagged = 0;
 		i = 0;
-		char input[50] = {'\0'};
-		char command[40] = {'\0'};
-		char filename[40] = {'\0'};
-		char flagcommand[40] = {'\0'};
+		char input[50];
+		char command[40];
+		char filename[40];
+		char flagcommand[40];
 		
 		//get the input
 		fgets(input, 50, stdin);
 		//Cast input to lowercase
 		int j;
-		for(j = 0; input[j] != '\0' && j<50; j++)input[j] = tolower(input[j]);
+		for(j = 0; input[j] != '\0' && j<50; j++) input[j] = tolower(input[j]);
 		
 		char* token;
 		const char s[2] = " \n";
@@ -392,12 +392,10 @@ int main()
 		}
 		else if (strcmp(command,"showfat") == 0 && mounted == 1)
 		{
-			printf("\n %s",command);
 			showfat(arg1);
 		}
 		else if (strcmp(command,"showsector") == 0 && mounted == 1)
 		{
-			printf("\n %s",command);
 			showsector(arg1);
 		}
 		else
