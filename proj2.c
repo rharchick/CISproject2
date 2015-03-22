@@ -246,14 +246,14 @@ void showfat(char b[])
         endSector = 18;
         printf("\n\nFAT table 1 and 2: \n");
     }
-    printf("         0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f");
-    
+    printf("         0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f");
+   
     for(a = startSector; a <= endSector; ++a)
     {
         lseek(3, 512*a, SEEK_SET); //changes to the start position of sector 'a' (512 bytes per sector)
         read(3, buffer, 512); //reads 512 bytes (the entire sector) into the buffer
-        printf("\n");
-        for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
+        printf("\nSector:%d\n",a);
+        for(i = 2; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
             if(i % 16 == 0)
                 printf("\n  %03X  ",i);
@@ -294,11 +294,11 @@ int main()
 {
 	const char prompt[] = {"\n:flop: "};
 	char *flopname[50];
-	short i, j, quit = 0; //loop and sentinel variables
+	short i, j, isQuitting = 0; //loop and sentinel variables
 	short mounted = 0; //indicates if a floppy has been mounted
 	
 	//While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
-	while (quit == 0)
+	while (isQuitting == 0)
 	{
 		char words[10][20];
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
@@ -376,7 +376,7 @@ int main()
 		{
 			if(mounted==1)
 				fumount(flopname);
-			quit = 1;
+			isQuitting = 1;
 		}
 		else if (mounted == 0) //all commands below this point require a mounted floppy to execute; this prevents reading from an empty fd
 			printf("\nNo Floppy Disc Has Been Mounted, or invalid command has been entered.\n");
