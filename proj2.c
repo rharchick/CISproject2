@@ -302,14 +302,13 @@ int main()
 	{
 		printf(prompt);
 		
-		char words[10][40];
+		char words[10][20];
+		char input[50] = {'\0'}; //used for storing user input commands
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
+		char command[30] = {'\0'};
+		char filename[30] = {'\0'};
+		char flagcommand[30] = {'\0'};
 		short flagged = 0;
-		i = 0;
-		char input[50];
-		char command[40];
-		char filename[40];
-		char flagcommand[40];
 		
 		//get the input
 		fgets(input, 50, stdin);
