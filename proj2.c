@@ -292,28 +292,20 @@ void showsector(char arg[])
 }
 int main()
 {
-	const char prompt[] = {"\nflop: "};
+	const char prompt[] = {"\n:flop: "};
 	char *flopname[50];
 	short i, j, quit = 0; //loop and sentinel variables
-	FILE *fp; //used for output redirection
-	short fd; //will hold file descriptor value
-	int stdout_copy; //used to hold copy of stdout for output redirection
 	short mounted = 0; //indicates if a floppy has been mounted
 	
 	//While loop will continue to prompt user to enter commands; loop is broken upon receiving the quit command
 	while (quit == 0)
 	{
-		//Variables are re-declared for every loop iteration as a means to 'clear' previous values
-		
-		//Words: This is going to be a multidemensional array to help split up to 10 inputs, including the extra flags!
-		//words[0] = input
-		//words[1] = 
 		char words[10][20];
-		char input[50] = {'\0'}; //used for storing user input commands
 		char *arg1 = malloc(30); //used for storing arguments that users pass to commands
+		short flagValue = 0;
+		char input[50] = {'\0'}; //used for storing user input commands
 		char command[30] = {'\0'};
 		char filename[30] = {'\0'};
-		short flagValue = 0;
 		char flagcommand[30] = {'\0'};
 		
 		i = 0;
@@ -330,14 +322,13 @@ int main()
 		strcpy(words[i],token);
 		/* walk through other tokens */
 		while( token != NULL ) 
-			{
-				i++;
-				token = strtok(NULL, s);
-				if(token != NULL)
-					strcpy(words[i],token);
-			}
-			strcpy(words[i], "");
-		   //TIME TO TRAVERSE THE INPUTS!!!
+		{
+			i++;
+			token = strtok(NULL, s);
+			if(token != NULL)
+				strcpy(words[i],token);
+		}
+		strcpy(words[i], "");
 
 		strcpy(command, words[0]);//Copies the first input into command, this is the most important one
 		i = 1; //starts at second word
@@ -354,17 +345,17 @@ int main()
 			i++;
 		}
 		//Basically serves as a 'switch' statement to check the command entered against the valid list of commands
-		if (strcmp("help",command) == 0) 
+		if (strcmp(command,"help") == 0) 
 		{
-			printf("SUPPORTED COMMANDS: \n\n ");
-			printf("HELP -- Display a list of supported commands \n ");
-			printf("FMOUNT [Argument] -- Mount a local floppy disk (argument) \n ");
-			printf("FUMOUNT -- Unmount the mounted floppy disk \n ");
-			printf("STRUCTURE -- Display the structure of a floppy disk \n ");
-			printf("TRAVERSE [-l] -- Display the root directory contents \n ");
-			printf("SHOWFAT -- Display content of the FAT tables \n ");
-			printf("SHOWSECTOR [SectorNumber] -- Show content of specified sector \n ");
-			printf("QUIT -- Quit the floppy shell \n");
+			printf("Commands: \n\n ");
+			printf("help 			- Displays useable commands \n ");
+			printf("fmount (Argument) 	- Mount a floppy disk (argument) \n ");
+			printf("fumount 		- Unmount the mounted floppy disk \n ");
+			printf("structure 		- Display the structure of a floppy disk \n ");
+			printf("traverse (-l) 		- Display the root directory contents (with the option to show more info) \n ");
+			printf("showfat 		- Display content of the FAT tables \n ");
+			printf("showsector (sector #) 	- Show content of the sector \n ");
+			printf("quit 			- Quit out of the floppy shell \n");
 		}
 		else if (strcmp(command,"fmount") == 0)
 		{
@@ -398,7 +389,7 @@ int main()
 		else if (strcmp(command,"showsector") == 0)
 			showsector(arg1);
 		else
-			printf("\nInvalid command '%s' entered.  Type 'help' for a list of commands.", command);
+			printf("\nThe command '%s' is invalid or you have no floppy disk mounted.  Type 'help' for a list of commands.", command);
 
 	}
 	return 0;
