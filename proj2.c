@@ -246,6 +246,7 @@ void showfat(char b[])
         endSector = 18;
         printf("\n\nFAT table 1 and 2: \n");
     }
+    printf("         0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f");
     
     for(a = startSector; a <= endSector; ++a)
     {
@@ -255,8 +256,8 @@ void showfat(char b[])
         for(i = 0; i < 512; ++i) //prints each character read in as hex values, rows of 16
         {
             if(i % 16 == 0)
-                printf("\n     ");
-            printf("%02X ", (unsigned char)buffer[i]); //casts to unsigned to avoid leading F's in certain characters
+                printf("\n  %03X  ");
+            printf("%03X ", (unsigned char)buffer[i]); //casts to unsigned to avoid leading F's in certain characters
         }
     }
     printf("\n");
