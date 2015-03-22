@@ -120,7 +120,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
         if (attributeNum > 3 && attributeNum < 8 || attributeNum > 11) //if second-highest bit is set
             attributes[4] = 'S'; //system file
     }
-    printf("   \t%s  ", attributes); //display file attributes
+    printf("%s  ", attributes); //display file attributes
     
     //DATE
     unsigned int year = 1980,monthNum = 0,dayNum = 0,monthDay,yearOffset = 0;
@@ -154,15 +154,15 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     //SECONDS
     minSec = fileInfoDec[14]; //restore minSec
     minSec = (minSec%32); //cast off upper 3 bits to obtain seconds
-    printf("%02d \t\t", minSec);
+    printf("%02d \t", minSec);
     
     //File Size
     unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
     newDecValue = multiByteHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
-    printf("%d\t\t", newDecValue);
+    printf("%d\t", newDecValue);
     //First Sector
     newDecValue = multiByteHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
-    printf("%d", newDecValue);
+    printf("%d\t", newDecValue);
 }
 
 void traverse(short flag)
@@ -202,13 +202,13 @@ void traverse(short flag)
             {
                 for (a = 0; a < 11; ++a)
                     printf("%c", fileInfo[a]);
-                printf(" <DIR>");
+                printf("\t<DIR>");
             }
             else //ELSE ENTRY IS A REGULAR FILE
             {
                 for (a = 0; a < 11; ++a)
                 {
-                    printf("%c", fileInfo[a]);
+                    if(fileInfo[a]!=' ')printf("%c", fileInfo[a]);
                     if (a == 7) //last 3 characters will be the extension, 'appending' a dot after a filename for stylization
                         printf(".");
                 }
