@@ -13,7 +13,7 @@
 This function converts a specified number of bytes (in little endian order) from a character array into a decimal equivalent value and returns that value as an unsigned int
 fileInfo is the character array to read from, highestIndex is the location of the most significant byte you are targetting, numBytes is how many bytes long the value is, and the result of the calculation is stored in newValue
 */
-unsigned int multiByteHexToDec(unsigned char fileInfo[], short highestIndex, short numBytes, unsigned int * newValue)
+unsigned int convertHexToDec(unsigned char fileInfo[], short highestIndex, short numBytes, unsigned int * newValue)
 {
     short power = numBytes*2 - 1; //one character takes up 2 hex digits, with the least significant hex digit representing 16^0
     *newValue = 0; //dereference and clear newValue
@@ -73,17 +73,17 @@ void fumount(char * floppyName[])
 void structure()
 {
     unsigned char bootSector[62] = {'\0'};
-    unsigned int newDecValue = 0; //used to hold return values from multiByteHexToDec
+    unsigned int newDecValue = 0;
     
     lseek(3, 0, SEEK_SET); //seek to beginning of floppy
     read(3, bootSector, 62); //read in necessary characters from the boot sector
     printf("\n# of FAT: 			%d", bootSector[16]);
-    newDecValue = multiByteHexToDec(bootSector, 23, 2, &newDecValue); //convert bytes 22 to 23 from chars to an integer total
+    newDecValue = convertHexToDec(bootSector, 23, 2, &newDecValue); //convert bytes 22 to 23 from chars to an integer total
     printf("\n# of sectors used by FAT: 	%d", newDecValue);
     printf("\n# of sectors per cluster: 	%d", bootSector[13]);
-    newDecValue = multiByteHexToDec(bootSector, 18, 2, &newDecValue); //convert bytes 17 to 18 from chars to an integer total
+    newDecValue = convertHexToDec(bootSector, 18, 2, &newDecValue); //convert bytes 17 to 18 from chars to an integer total
     printf("\n# of ROOT Entries: 		%d", newDecValue);
-    newDecValue = multiByteHexToDec(bootSector, 12, 2, &newDecValue); //convert bytes 11 to 12 from chars to an integer total
+    newDecValue = convertHexToDec(bootSector, 12, 2, &newDecValue); //convert bytes 11 to 12 from chars to an integer total
     printf("\n# of bytes per sector: 		%d\n\n", newDecValue);
     printf("Sector #   		Sector Types\n");
     printf("----------		----------\n");
@@ -157,11 +157,11 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     printf("%02d \t", minSec);
     
     //File Size
-    unsigned int newDecValue = 0; //used to store return value of multiByteHexToDec
-    newDecValue = multiByteHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
+    unsigned int newDecValue = 0; 
+    newDecValue = convertHexToDec(fileInfo, 31, 4, &newDecValue); //convert bytes 28 to 31 from chars to an integer total
     printf("%d\t", newDecValue);
     //First Sector
-    newDecValue = multiByteHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
+    newDecValue = convertHexToDec(fileInfo, 27, 2, &newDecValue); //convert bytes 26 to 27 from chars to an integer total
     printf("%d\t", newDecValue);
 }
 
@@ -393,12 +393,12 @@ int main()
 		}
 		else if (strcmp(command,"showfat") == 0 && mounted == 1)
 		{
-			printf(command);
+			printf("\n %s",command);
 			showfat(arg1);
 		}
 		else if (strcmp(command,"showsector") == 0 && mounted == 1)
 		{
-			printf(command);
+			printf("\n %s",command);
 			showsector(arg1);
 		}
 		else
