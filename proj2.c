@@ -307,9 +307,9 @@ int main()
 		short flagged = 0;
 		i = 0;
 		char input[50] = {'\0'};
-		char command[50] = {'\0'};
-		char filename[50] = {'\0'};
-		char flagcommand[50] = {'\0'};
+		char command[40] = {'\0'};
+		char filename[40] = {'\0'};
+		char flagcommand[40] = {'\0'};
 		
 		//get the input
 		fgets(input, 50, stdin);
@@ -348,12 +348,12 @@ int main()
 		///////////////////////////////////////
 		//Execute any commands
 		//////////////////////////////////////
-		if (strcmp("quit",command) == 0)
+		if (strcmp(command,"quit") == 0)
 		{
 			if(mounted == 1)fumount(flopname);
 			isRunning = 0;
 		}
-		else if (strcmp("help",command) == 0) 
+		else if (strcmp(command,"help") == 0) 
 		{
 			printf("Commands: \n\n ");
 			printf("help 			- Displays useable commands \n ");
