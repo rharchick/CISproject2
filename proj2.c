@@ -106,7 +106,7 @@ void PrintMoreSectorInfo(unsigned int fileInfoDec[], char fileInfo[])
     if (attributeNum > 15) //if upper 4 bits have a non-zero value, check for archive/subdir status
     {
         if (attributeNum < 32)//Subdirectory
-            attributes[0] = 'D'; 
+            attributes[0] = '-'; 
         else if (attributeNum < 48)//Archive
             attributes[1] = 'A'; 
     }
@@ -172,6 +172,7 @@ void traverse(short flag)
     unsigned int fileInfoDec[32] = {'\0'}; //int array will store decimal equivalents of fileInfo characters
     
     if (flag == 1) {
+        printf("\n");
         printf("*****************************\n");
         printf("** FILE ATTRIBUTE NOTATION **\n");
         printf("**                         **\n");
@@ -180,7 +181,7 @@ void traverse(short flag)
         printf("** H ------ HIDDEN FILE    **\n");
         printf("** A ------ ARCHIVE FILE   **\n");
         printf("*****************************\n");
-        printf("ATTRIB\tDATE\tTIME\tSIZE\tSECTOR\tNAME");
+        printf("ATTRIB\tDATE\t\tTIME\t\t\tSIZE\tSECTOR\tNAME\n");
     }
     
     for (sector = 19; sector < 33; ++sector) //reads through sectors 19-32 (root sectors)
