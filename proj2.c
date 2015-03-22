@@ -431,7 +431,9 @@ int main()
 				mounted = 0;//no disc mounted
 			}
 			else
+			{
 				printf("\nFirst mount a floppy disk\n");
+			}
 		}
 		else if (strcmp(command,"quit") == 0)
 		{
